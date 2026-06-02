@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İntegral Soru Bankası</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    
+    <style>
+        /* Tarayıcı bazlı kaydırma çubuklarını buton içlerinde kesin olarak gizlemek için ekstra güvenlik */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex items-center justify-center font-sans p-4">
+
+    <div id="root" class="w-full max-w-3xl"></div>
+
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // KaTeX Dinamik Bileşen
+        const MathText = ({ math, block = false }) => {
+            const containerRef = useRef(null);
+
+            useEffect(() => {
+                if (containerRef.current) {
+                    katex.render(math, containerRef.current, {
+                        displayMode: block,
+                        throwOnError: false
+                    });
+                }
+            }, [math, block]);
+
+            return <span ref={containerRef} />;
+        };
+
+        // 70 SORULUK DEV ENTEGRAL ARŞİVİ
+        const questions = [
+            { id: 1, q: "x \\cos 2x \\, dx", options: ["\\frac{1}{2}x \\sin 2x - \\frac{1}{4}\\cos 2x + C", "\\frac{1}{2}x \\sin 2x + \\frac{1}{4}\\cos 2x + C", "2x \\sin 2x + 4\\cos 2x + C", "\\frac{1}{2}x \\cos 2x + \\frac{1}{4}\\sin 2x + C", "\\frac{1}{2}x \\sin 2x + \\frac{1}{4}\\cos 2x"], answer: 1 },
+            { id: 2, q: "x \\cos x^2 \\, dx", options: ["\\frac{1}{2}\\sin x^2 + C", "-\\frac{1}{2}\\sin x^2 + C", "2\\sin x^2 + C", "\\frac{1}{2}x\\sin x^2 + C", "\\sin x^2 + C"], answer: 0 },
+            { id: 3, q: "\\tan^3 x \\sec x \\, dx", options: ["\\frac{1}{3}\\sec^3 x + \\sec x + C", "\\frac{1}{3}\\tan^3 x - \\tan x + C", "\\frac{1}{3}\\sec^3 x - \\sec x + C", "-\\frac{1}{3}\\sec^3 x + \\sec x + C", "\\frac{1}{3}\\sec^3 x - \\sec x"], answer: 2 },
+            { id: 4, q: "\\sin^3 x \\cos^2 x \\, dx", options: ["\\frac{1}{3}\\cos^3 x - \\frac{1}{5}\\cos^5 x + C", "-\\frac{1}{3}\\sin^3 x + \\frac{1}{5}\\sin^5 x + C", "-\\frac{1}{3}\\cos^3 x - \\frac{1}{5}\\cos^5 x + C", "-\\frac{1}{3}\\cos^3 x + \\frac{1}{5}\\cos^5 x + C", "-\\cos^3 x + \\cos^5 x + C"], answer: 3 },
+            { id: 5, q: "\\tan^2 3t \\sec^2 3t \\, dt", options: ["\\frac{1}{3}\\tan^3 3t + C", "\\frac{1}{9}\\sec^3 3t + C", "\\frac{1}{9}\\tan^3 3t + C", "-\\frac{1}{9}\\tan^3 3t + C", "\\frac{1}{9}\\tan^3 3t"], answer: 2 },
+            { id: 6, q: "\\cot 2x \\csc^3 2x \\, dx", options: ["-\\frac{1}{6}\\csc^3 2x + C", "\\frac{1}{6}\\csc^3 2x + C", "-\\frac{1}{3}\\csc^3 2x + C", "-\\frac{1}{6}\\cot^3 2x + C", "-\\frac{1}{2}\\csc^3 2x + C"], answer: 0 },
+            { id: 7, q: "\\frac{\\sin^2 x}{1 + \\cos x} \\, dx", options: ["x + \\sin x + C", "x - \\sin x + C", "-x - \\sin x + C", "x - \\cos x + C", "1 - \\sin x + C"], answer: 1 },
+            { id: 8, q: "\\frac{\\sin 2x}{\\cos x (1 + \\cos x)} \\, dx", options: ["2\\ln|1 + \\cos x| + C", "-2\\ln|1 + \\cos x| + C", "-\\ln|1 + \\cos x| + C", "-2\\ln|\\cos x| + C", "-\\frac{2}{1 + \\cos x} + C"], answer: 1 },
+            { id: 9, q: "x^2 \\cos^2 x \\, dx", options: ["\\frac{1}{6}x^3 + \\frac{1}{4}x^2 \\sin 2x + \\frac{1}{4}x \\cos 2x - \\frac{1}{8}\\sin 2x + C", "\\frac{1}{6}x^3 + \\frac{1}{4}x^2 \\sin 2x - \\frac{1}{4}x \\cos 2x - \\frac{1}{8}\\sin 2x + C", "\\frac{1}{6}x^3 - \\frac{1}{4}x^2 \\sin 2x - \\frac{1}{4}x \\cos 2x + \\frac{1}{8}\\sin 2x + C", "\\frac{1}{3}x^3 + \\frac{1;2}x^2 \\sin 2x + \\frac{1}{2}x \\cos 2x - \\frac{1}{4}\\sin 2x + C", "\\frac{1}{6}x^3 + \\frac{1}{4}x^2 \\sin 2x + \\frac{1}{4}x \\cos 2x - \\frac{1}{8}\\sin 2x"], answer: 0 },
+            { id: 10, q: "\\sin^2 2x \\cos^2 2x \\, dx", options: ["\\frac{1}{8}x - \\frac{1}{8}\\sin 8x + C", "\\frac{1}{8}x + \\frac{1;32}\\sin 8x + C", "\\frac{1}{8}x - \\frac{1;32}\\sin 8x + C", "\\frac{1}{4}x - \\frac{1;16}\\sin 4x + C", "\\frac{1}{8}x - \\frac{1;16}\\sin 8x + C"], answer: 2 },
+            { id: 11, q: "\\sec^5 x \\sin x \\, dx", options: ["-\\frac{1}{4}\\sec^4 x + C", "\\frac{1}{4}\\sec^4 x + C", "\\frac{1}{5}\\sec^5 x + C", "\\frac{1}{4}\\tan^4 x + C", "\\frac{1}{4}\\sec^4 x"], answer: 1 },
+            { id: 12, q: "\\tan^5 2x \\, dx", options: ["\\frac{1}{8}\\tan^4 2x - \\frac{1}{4}\\tan^2 2x - \\frac{1}{2}\\ln|\\cos 2x| + C", "\\frac{1}{8}\\tan^4 2x - \\frac{1}{4}\\tan^2 2x + \\frac{1}{2}\\ln|\\cos 2x| + C", "\\frac{1}{4}\\tan^4 2x - \\frac{1}{2}\\tan^2 2x - \\ln|\\cos 2x| + C", "\\frac{1}{8}\\tan^4 2x + \\frac{1}{4}\\tan^2 2x - \\frac{1}{2}\\ln|\\cos 2x| + C", "\\frac{1}{8}\\tan^4 2x - \\frac{1}{4}\\tan^2 2x - \\frac{1}{2}\\ln|\\sin 2x| + C"], answer: 0 },
+            { id: 13, q: "\\sin^4 x \\cos^2 x \\, dx", options: ["\\frac{1}{16}x - \\frac{1}{64}\\sin 4x + \\frac{1}{48}\\sin^3 2x + C", "\\frac{1}{16}x + \\frac{1}{64}\\sin 4x - \\frac{1}{48}\\sin^3 2x + C", "\\frac{1}{16}x - \\frac{1}{64}\\sin 4x - \\frac{1}{48}\\sin^3 2x + C", "\\frac{1}{16}x - \\frac{1}{32}\\sin 4x - \\frac{1}{24}\\sin^3 2x + C", "\\frac{1}{16}x - \\frac{1}{64}\\sin 4x - \\frac{1}{48}\\sin^3 2x"], answer: 2 },
+            { id: 14, q: "\\frac{dx}{\\sec^4 x}", options: ["\\frac{3}{8}x - \\frac{1}{4}\\sin 2x + \\frac{1}{32}\\sin 4x + C", "\\frac{3}{8}x + \\frac{1}{4}\\sin 2x + \\frac{1}{32}\\sin 4x + C", "\\frac{3}{8}x + \\frac{1}{4}\\sin 2x - \\frac{1}{32}\\sin 4x + C", "\\frac{3}{8}x + \\frac{1}{2}\\sin 2x + \\frac{1}{16}\\sin 4x + C", "\\frac{1}{4}\\sin^4 x + C"], answer: 1 },
+            { id: 15, q: "\\int_{0}^{\\pi/4} \\sin 5x \\sin 3x \\, dx", options: ["-\\frac{1}{4}", "\\frac{1}{2}", "\\frac{1}{8}", "\\frac{1}{4}", "0"], answer: 3 },
+            { id: 16, q: "\\int_{-\\pi/10}^{0} \\sin 2x \\cos 3x \\, dx", options: ["\\frac{\\sqrt{10+2\\sqrt{5}}}{4} + \\frac{2}{5}", "-\\frac{\\sqrt{10+2\\sqrt{5}}}{4} - \\frac{2}{5}", "\\frac{\\sqrt{10+2\\sqrt{5}}}{4} - \\frac{2}{5}", "\\frac{\\sqrt{10-2\\sqrt{5}}}{4} - \\frac{2}{5}", "\\frac{\\sqrt{10+2\\sqrt{5}}}{2} - \\frac{4}{5}"], answer: 2 },
+            { id: 17, q: "\\int_{0}^{1} \\sin^2 \\pi x \\, dx", options: ["1", "\\frac{1}{2}", "-\\frac{1}{2}", "\\frac{\\pi}{2}", "\\frac{1}{2\\pi}"], answer: 1 },
+            { id: 18, q: "\\int_{0}^{\\pi/3} \\sin^3 3x \\, dx", options: ["\\frac{4}{9}", "-\\frac{4}{9}", "\\frac{2}{9}", "\\frac{4}{3}", "0"], answer: 0 },
+            { id: 19, q: "\\int_{0}^{\\sqrt{\\pi}/2} x \\sec^2(x^2) \\, dx", options: ["1", "-\\frac{1}{2}", "\\frac{1}{2}", "\\frac{1}{4}", "\\sqrt{2}"], answer: 2 },
+            { id: 20, q: "\\int_{0}^{\\pi/4} \\frac{\\sec^2 x}{\\sqrt{1 + 3\\tan x}} \\, dx", options: ["\\frac{4}{3}", "\\frac{2}{3}", "-\\frac{2}{3}", "2", "\\frac{1}{3}"], answer: 1 },
+            { id: 21, q: "\\frac{\\sin(\\cot^{-1} x)}{1 + x^2} \\, dx", options: ["\\cos(\\cot^{-1} x) + C", "-\\sin(\\cot^{-1} x) + C", "-\\cos(\\cot^{-1} x) + C", "-\\cos(\\tan^{-1} x) + C", "-\\frac{x}{\\sqrt{1+x^2}}"], answer: 2 },
+            { id: 22, q: "\\frac{e^{\\tan 3x}}{\\cos^2 3x} \\, dx", options: ["3e^{\\tan 3x} + C", "\\frac{1}{3}e^{\\tan 3x} + C", "-\\frac{1}{3}e^{\\tan 3x} + C", "\\frac{1}{3}e^{\\cot 3x} + C", "\\frac{1}{3}e^{\\tan 3x}"], answer: 1 },
+            { id: 23, q: "e^x \\sec(e^x) \\, dx", options: ["\\ln|\\sec(e^x) + \\tan(e^x)| + C", "-\\ln|\\sec(e^x) + \\tan(e^x)| + C", "\\ln|\\sec(e^x)| + C", "e^x\\ln|\\sec(e^x) + \\tan(e^x)| + C", "\\ln|\\sec(e^x) - \\tan(e^x)| + C"], answer: 0 },
+            { id: 24, q: "x \\sec^2 3x \\, dx", options: ["\\frac{1}{3}x \\tan 3x - \\frac{1}{9}\\ln|\\cos 3x| + C", "\\frac{1}{3}x \\tan 3x + \\frac{1}{9}\\ln|\\cos 3x| + C", "\\frac{1}{3}x \\tan 3x + \\frac{1}{3}\\ln|\\cos 3x| + C", "3x \\tan 3x + 9\\ln|\\cos 3x| + C", "\\frac{1}{3}x \\sec 3x + \\frac{1}{9}\\ln|\\sin 3x| + C"], answer: 1 },
+            { id: 25, q: "\\frac{e^{2x}}{\\sqrt{e^{2x} + 1}} \\, dx", options: ["2\\sqrt{e^{2x} + 1} + C", "\\frac{1}{2}\\sqrt{e^{2x} + 1} + C", "-\\sqrt{e^{2x} + 1} + C", "\\sqrt{e^{2x} + 1} + C", "\\ln|e^{2x} + 1| + C"], answer: 3 },
+            { id: 26, q: "\\frac{e^x}{\\sqrt{e^{2x} + 1}} \\, dx", options: ["\\ln(e^x + \\sqrt{e^{2x} + 1}) + C", "\\sqrt{e^{2x} + 1} + C", "\\ln(e^x - \\sqrt{e^{2x} + 1}) + C", "\\frac{1}{2}\\ln(e^x + \\sqrt{e^{2x} + 1}) + C", "\\sin^{-1}(e^x) + C"], answer: 0 },
+            { id: 27, q: "e^{3x} \\sin 2x \\, dx", options: ["\\frac{e^{3x}(3\\sin 2x + 2\\cos 2x)}{13} + C", "\\frac{e^{3x}(3\\sin 2x - 2\\cos 2x)}{5} + C", "\\frac{e^{3x}(3\\sin 2x - 2\\cos 2x)}{13} + C", "\\frac{e^{3x}(2\\sin 2x - 3\\cos 2x)}{13} + C", "\\frac{e^{3x}(3\\sin 2x - 2\\cos 2x)}{13}"], answer: 2 },
+            { id: 28, q: "\\ln(a^2 + x^2) \\, dx", options: ["x \\ln(a^2 + x^2) - 2x + 2a \\tan^{-1}\\left(\\frac{x}{a}\\right) + C", "x \\ln(a^2 + x^2) + 2x - 2a \\tan^{-1}\\left(\\frac{x}{a}\\right) + C", "x \\ln(a^2 + x^2) - 2x - 2a \\tan^{-1}\\left(\\frac{x}{a}\\right) + C", "x \\ln(a^2 + x^2) - x + a \\tan^{-1}\\left(\\frac{x}{a}\\right) + C", "x \\ln(a^2 + x^2) - 2x + 2a \\tan^{-1}\\left(\\frac{x}{a}\\right)"], answer: 0 },
+            { id: 29, q: "\\int_{1}^{2} \\sin^{-1}(x/2) \\, dx", options: ["\\frac{5\\pi}{6} + \\sqrt{3}", "\\frac{\\pi}{2}", "\\frac{5\\pi}{6} - \\sqrt{3}", "\\frac{\\pi}{6} - \\sqrt{3}", "\\pi - \\sqrt{3}"], answer: 2 },
+            { id: 30, q: "(\\ln x)^2 \\, dx", options: ["x(\\ln x)^2 - 2x \\ln x - 2x + C", "x(\\ln x)^2 - 2x \\ln x + 2x + C", "x(\\ln x)^2 + 2x \\ln x + 2x + C", "x(\\ln x)^2 - x \\ln x + x + C", "x(\\ln x)^2 - 2x \\ln x + 2x"], answer: 1 },
+            { id: 31, q: "\\frac{\\ln x}{x^2} \\, dx", options: ["-\\frac{\\ln x}{x} + \\frac{1}{x} + C", "\\frac{\\ln x}{x} - \\frac{1}{x} + C", "-\\frac{\\ln x}{x} - \\frac{1}{x} + C", "-\\frac{\\ln x}{2x^2} - \\frac{1}{2x^2} + C", "-\\frac{\\ln x}{x} - \\frac{1}{x}"], answer: 2 },
+            { id: 32, q: "x^3 e^{-x^2} \\, dx", options: ["-\\frac{1}{2}e^{-x^2}(x^2 - 1) + C", "\\frac{1}{2}e^{-x^2}(x^2 + 1) + C", "-\\frac{1}{2}e^{-x^2}(x^2 + 1) + C", "-e^{-x^2}(x^2 + 1) + C", "-\\frac{1}{2}e^{-x^2}(x^2 + 1)"], answer: 2 },
+            { id: 33, q: "\\frac{x}{\\sqrt{x^2 - 9}} \\, dx", options: ["2\\sqrt{x^2 - 9} + C", "\\frac{1}{2}\\sqrt{x^2 - 9} + C", "-\\sqrt{x^2 - 9} + C", "\\sqrt{x^2 - 9} + C", "\\ln|x + \\sqrt{x^2 - 9}| + C"], answer: 3 },
+            { id: 34, q: "\\int_{1}^{2} \\frac{\\sqrt{4x^2 - 1}}{x} \\, dx", options: ["\\sqrt{15} - \\sqrt{3} + \\tan^{-1}(\\sqrt{15}) - \\frac{\\pi}{3}", "\\sqrt{15} - \\sqrt{3} - \\tan^{-1}(\\sqrt{15}) + \\frac{\\pi}{3}", "\\sqrt{15} - \\sqrt{3} - \\tan^{-1}(\\sqrt{15}) - \\frac{\\pi}{3}", "\\sqrt{15} + \\sqrt{3} - \\tan^{-1}(\\sqrt{15}) + \\frac{\\pi}{3}", "\\sqrt{15} - \\sqrt{3}"], answer: 1 },
+            { id: 35, q: "\\int_{1}^{3} \\frac{\\sqrt{9 - x^2}}{x} \\, dx", options: ["3\\ln(3 + 2\\sqrt{2}) + 2\\sqrt{2}", "3\\ln(3 + 2\\sqrt{2}) - 2\\sqrt{2}", "-3\\ln(3 + 2\\sqrt{2}) - 2\\sqrt{2}", "\\ln(3 + 2\\sqrt{2}) - 2\\sqrt{2}", "3\\ln(3 + 2\\sqrt{2}) - \\sqrt{8}"], answer: 1 },
+            { id: 36, q: "\\int_{-\\sqrt{8}}^{-\\sqrt{8/3}} \\frac{ds}{s\\sqrt{s^2 + 8}}", options: ["\\frac{1}{\\sqrt{8}}\\left[\\ln(2+\\sqrt{3})\\right]", "-\\frac{1}{\\sqrt{8}}\\left[\\ln(2+\\sqrt{3})\\right]", "-\\ln(2+\\sqrt{3})", "-\\frac{1}{8}\\left[\\ln(2+\\sqrt{3})\\right]", "-\\frac{1}{\\sqrt{8}}\\left[\\ln(2-\\sqrt{3})\\right]"], answer: 1 },
+            { id: 37, q: "\\frac{x^2}{\\sqrt{2x + 3}} \\, dx", options: ["\\frac{1}{10}(2x+3)^{5/2} - \\frac{1}{3}(2x+3)^{3/2} + \\frac{9}{14}(2x+3)^{1/2} + C", "\\frac{1}{5}(2x+3)^{5/2} - \\frac{2}{3}(2x+3)^{3/2} + \\frac{9}{7}(2x+3)^{1/2} + C", "\\frac{1}{10}(2x+3)^{5/2} + \\frac{1}{3}(2x+3)^{3/2} + \\frac{9}{14}(2x+3)^{1/2} + C", "\\frac{1}{10}(2x+3)^{5/2} - \\frac{1}{3}(2x+3)^{3/2} - \\frac{9}{14}(2x+3)^{1/2} + C", "\\frac{1}{10}(2x+3)^{5/2} - \\frac{1}{3}(2x+3)^{3/2} + \\frac{9}{14}(2x+3)^{1/2}"], answer: 0 },
+            { id: 38, q: "\\frac{dx}{\\sqrt{x^2 + 16}}", options: ["\\ln|x + \\sqrt{x^2 + 16}| + C", "\\ln|x - \\sqrt{x^2 + 16}| + C", "-\\ln|x + \\sqrt{x^2 + 16}| + C", "\\frac{1}{4}\\tan^{-1}\\left(\\frac{x}{4}\\right) + C", "\\ln|x + \\sqrt{x^2 + 16}|"], answer: 0 },
+            { id: 39, q: "x \\sqrt{x+1} \\, dx", options: ["\\frac{2}{5}(x+1)^{5/2} - \\frac{2}{3}(x+1)^{3/2} + C", "\\frac{2}{5}(x+1)^{5/2} + \\frac{2}{3}(x+1)^{3/2} + C", "\\frac{1}{5}(x+1)^{5/2} - \\frac{1}{3}(x+1)^{3/2} + C", "\\frac{2}{3}(x+1)^{3/2} - \\frac{2}{5}(x+1)^{5/2} + C", "2(x+1)^{5/2} - 3(x+1)^{3/2} + C"], answer: 0 },
+            { id: 40, q: "\\frac{x^2-1}{x^2+1} \\, dx", options: ["x + 2\\tan^{-1} x + C", "x - 2\\tan^{-1} x + C", "x - \\tan^{-1} x + C", "2x - \\tan^{-1} x + C", "x - 2\\ln|x^2+1| + C"], answer: 1 },
+            { id: 41, q: "\\frac{dx}{x^2 + 4x + 5}", options: ["\\tan^{-1}(x+2) + C", "\\tan^{-1}(x-2) + C", "\\ln|x^2+4x+5| + C", "\\frac{1}{2}\\tan^{-1}(x+2) + C", "\\tan^{-1} x + C"], answer: 0 },
+            { id: 42, q: "\\frac{e^x}{e^{2x} + 4} \\, dx", options: ["\\frac{1}{2}\\tan^{-1}\\left(\\frac{e^x}{2}\\right) + C", "\\tan^{-1}\\left(\\frac{e^x}{2}\\right) + C", "\\frac{1}{2}\\ln|e^{2x}+4| + C", "e^x \\tan^{-1}(e^x) + C", "-\\frac{1}{2}\\tan^{-1}\\left(\\frac{e^x}{2}\\right) + C"], answer: 0 },
+            { id: 43, q: "\\frac{dx}{x\\ln x}", options: ["\\ln|\\ln x| + C", "\\frac{1}{2}(\\ln x)^2 + C", "\\ln|x| + C", "-\\ln|\\ln x| + C", "\\ln(\\ln(\\ln x)) + C"], answer: 0 },
+            { id: 44, q: "x^2 e^x \\, dx", options: ["e^x(x^2 - 2x + 2) + C", "e^x(x^2 + 2x - 2) + C", "e^x(x^2 - 2x) + C", "x^2 e^x - 2x e^x + C", "e^x(x^2 - 2x + 2)"], answer: 0 },
+            { id: 45, q: "\\int_{0}^{1} x e^x \\, dx", options: ["1", "e", "e - 1", "2 - e", "0"], answer: 0 },
+            { id: 46, q: "\\frac{2x+3}{x^2+3x+2} \\, dx", options: ["\\ln|x^2+3x+2| + C", "\\ln|x+1| + \\ln|x+2| + C", "\\frac{1}{2}\\ln|x^2+3x+2| + C", "2\\ln|x+1| + C", "\\ln|x^2+3x+2|"], answer: 0 },
+            { id: 47, q: "\\frac{1}{x^2-1} \\, dx", options: ["\\frac{1}{2}\\ln\\left|\\frac{x-1}{x+1}\\right| + C", "\\frac{1}{2}\\ln\\left|\\frac{x+1}{x-1}\\right| + C", "\\ln|x^2-1| + C", "\\tan^{-1} x + C", "\\frac{1}{2}\\tan^{-1} x + C"], answer: 0 },
+            { id: 48, q: "\\frac{dx}{x^2-4}", options: ["\\frac{1}{4}\\ln\\left|\\frac{x-2}{x+2}\\right| + C", "\\frac{1}{4}\\ln\\left|\\frac{x+2}{x-2}\\right| + C", "\\frac{1}{2}\\ln\\left|\\frac{x-2}{x+2}\\right| + C", "\\tan^{-1}\\left(\\frac{x}{2}\\right) + C", "\\frac{1}{4}\\tan^{-1}\\left(\\frac{x}{2}\\right) + C"], answer: 0 },
+            { id: 49, q: "\\frac{x}{(x-1)(x-2)} \\, dx", options: ["2\\ln|x-2| - \\ln|x-1| + C", "\\ln|x-1| - 2\\ln|x-2| + C", "2\\ln|x-1| - \\ln|x-2| + C", "\\ln|(x-1)(x-2)| + C", "2\\ln|x-2| + \\ln|x-1| + C"], answer: 0 },
+            { id: 50, q: "\\int_{0}^{\\pi/2} \\sin x \\, dx", options: ["1", "0", "-1", "\\pi", "\\frac{\\pi}{2}"], answer: 0 },
+            { id: 51, q: "\\int_{0}^{\\pi} \\cos x \\, dx", options: ["0", "1", "2", "-1", "-2"], answer: 0 },
+            { id: 52, q: "\\int_{1}^{e} \\frac{1}{x} \\, dx", options: ["1", "e", "0", "\\ln(e)-1", "e-1"], answer: 0 },
+            { id: 53, q: "\\int_{0}^{2} (3x^2 - 2x + 1) \\, dx", options: ["5", "6", "7", "8", "4"], answer: 1 },
+            { id: 54, q: "\\frac{dx}{1 + e^x}", options: ["x - \\ln(1 + e^x) + C", "-\\ln(1 + e^x) + C", "\\ln|1 + e^x| + C", "x + \\ln(1 + e^x) + C", "e^{-x} + C"], answer: 0 },
+            { id: 55, q: "\\frac{\\sin x}{\\sqrt{\\cos x}} \\, dx", options: ["-2\\sqrt{\\cos x} + C", "2\\sqrt{\\cos x} + C", "-\\sqrt{\\cos x} + C", "\\frac{1}{2}\\sqrt{\\cos x} + C", "-2\\cos^{3/2} x + C"], answer: 0 },
+            { id: 56, q: "\\frac{\\sec^2 x}{1 + \\tan x} \\, dx", options: ["\\ln|1 + \\tan x| + C", "-\\ln|1 + \\tan x| + C", "\\tan^{-1} x + C", "\\ln|\\sec x| + C", "\\frac{1}{1+\\tan x} + C"], answer: 0 },
+            { id: 57, q: "x e^{x^2} \\, dx", options: ["\\frac{1}{2}e^{x^2} + C", "e^{x^2} + C", "2e^{x^2} + C", "\\frac{1}{2}x^2 e^{x^2} + C", "- \\frac{1}{2}e^{x^2} + C"], answer: 0 },
+            { id: 58, q: "\\frac{dx}{x \\sqrt{1 - (\\ln x)^2}}", options: ["\\sin^{-1}(\\ln x) + C", "\\cos^{-1}(\\ln x) + C", "\\ln|\\sin x| + C", "\\tan^{-1}(\\ln x) + C", "\\sin^{-1} x + C"], answer: 0 },
+            { id: 59, q: "\\int_{0}^{1} \\frac{x}{x^2 + 1} \\, dx", options: ["\\frac{1}{2}\\ln 2", "\\ln 2", "\\frac{1}{4}\\ln 2", "1", "\\frac{\\pi}{4}"], answer: 0 },
+            { id: 60, q: "\\int_{0}^{\\pi/4} \\tan x \\, dx", options: ["\\frac{1}{2}\\ln 2", "-\\frac{1}{2}\\ln 2", "\\ln \\sqrt{2}", "\\ln 2", "0"], answer: 0 },
+            { id: 61, q: "\\sec x \\, dx", options: ["\\ln|\\sec x + \\tan x| + C", "\\ln|\\sec x - \\tan x| + C", "-\\ln|\\sec x + \\tan x| + C", "\\tan x + C", "\\ln|\\sec x| + C"], answer: 0 },
+            { id: 62, q: "\\csc x \\, dx", options: ["\\ln|\\csc x - \\cot x| + C", "\\ln|\\csc x + \\cot x| + C", "-\\ln|\\csc x - \\cot x| + C", "-\\cot x + C", "\\ln|\\tan x| + C"], answer: 0 },
+            { id: 63, q: "\\int_{0}^{1} \\frac{dx}{\\sqrt{1 - x^2}}", options: ["\\frac{\\pi}{2}", "\\pi", "\\frac{\\pi}{4}", "1", "0"], answer: 0 },
+            { id: 64, q: "\\int_{0}^{\\infty} e^{-x} \\, dx", options: ["1", "0", "\\infty", "-1", "e"], answer: 0 },
+            { id: 65, q: "\\frac{x^3}{x^4 + 1} \\, dx", options: ["\\frac{1}{4}\\ln(x^4 + 1) + C", "\\frac{1}{2}\\ln(x^4 + 1) + C", "\\ln(x^4 + 1) + C", "\\frac{1}{4}\\tan^{-1}(x^2) + C", "\\frac{x^4}{x^4+1} + C"], answer: 0 },
+            { id: 66, q: "\\frac{dx}{x(1 + \\ln^2 x)}", options: ["\\tan^{-1}(\\ln x) + C", "\\ln|1 + \\ln^2 x| + C", "\\frac{1}{2}\\tan^{-1}(\\ln x) + C", "-\\tan^{-1}(\\ln x) + C", "\\ln|\\ln x| + C"], answer: 0 },
+            { id: 67, q: "\\int_{1}^{2} x^3 \\, dx", options: ["\\frac{15}{4}", "4", "\\frac{7}{4}", "15", "\\frac{15}{2}"], answer: 0 },
+            { id: 68, q: "\\int_{0}^{4} \\sqrt{x} \\, dx", options: ["\\frac{16}{3}", "8", "\\frac{8}{3}", "4", "\\frac{32}{3}"], answer: 0 },
+            { id: 69, q: "\\frac{\\cos x}{1 + \\sin^2 x} \\, dx", options: ["\\tan^{-1}(\\sin x) + C", "\\ln|1 + \\sin^2 x| + C", "\\tan^{-1}(\\cos x) + C", "-\\tan^{-1}(\\sin x) + C", "\\sin^{-1}(\\sin x) + C"], answer: 0 },
+            { id: 70, q: "\\int_{0}^{1} (x^4 - x^2) \\, dx", options: ["-\\frac{2}{15}", "\\frac{2}{15}", "0", "-\\frac{1}{5}", "\\frac{1}{15}"], answer: 0 }
+        ];
+
+        function App() {
+            const [currentIdx, setCurrentIdx] = useState(0);
+            const [selectedOpt, setSelectedOpt] = useState(null);
+            const [isAnswered, setIsAnswered] = useState(false);
+            const [score, setScore] = useState(0);
+            const [showResult, setShowResult] = useState(false);
+
+            const currentQuestion = questions[currentIdx];
+
+            const handleOptionClick = (idx) => {
+                if (isAnswered) return;
+                setSelectedOpt(idx);
+            };
+
+            const handleSubmit = () => {
+                if (selectedOpt === null || isAnswered) return;
+                if (selectedOpt === currentQuestion.answer) setScore(score + 1);
+                setIsAnswered(true);
+            };
+
+            const handleNext = () => {
+                if (currentIdx + 1 < questions.length) {
+                    setCurrentIdx(currentIdx + 1);
+                    setSelectedOpt(null);
+                    setIsAnswered(false);
+                } else {
+                    setShowResult(true);
+                }
+            };
+
+            const resetQuiz = () => {
+                setCurrentIdx(0);
+                setSelectedOpt(null);
+                setIsAnswered(false);
+                setScore(0);
+                setShowResult(false);
+            };
+
+            const getLetter = (idx) => ["A", "B", "C", "D", "E"][idx];
+
+            if (showResult) {
+                return (
+                    <div className="bg-slate-800 rounded-2xl border border-slate-700 p-8 text-center shadow-xl">
+                        <div className="text-6xl mb-4">🏆</div>
+                        <h2 className="text-3xl font-extrabold mb-2">Test Bitti!</h2>
+                        <p className="text-slate-400 mb-6">Büyük İntegral Maratonu Performans Sonucu</p>
+                        <div className="bg-slate-900 rounded-xl p-6 mb-8 border border-slate-700 inline-block px-12">
+                            <span className="text-5xl font-black text-emerald-400">{score}</span>
+                            <span className="text-2xl text-slate-500 font-medium"> / {questions.length}</span>
+                        </div>
+                        <br />
+                        <button onClick={resetQuiz} className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-3 rounded-xl transition duration-150 cursor-pointer">
+                            Yeniden Başla
+                        </button>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="bg-slate-800 rounded-2xl shadow-2xl border border-slate-700 overflow-hidden">
+                    {/* İlerleme Çubuğu */}
+                    <div className="w-full bg-slate-700 h-2">
+                        <div className="bg-indigo-500 h-2 transition-all duration-300" style={{ width: `${((currentIdx + 1) / questions.length) * 100}%` }}></div>
+                    </div>
+                    
+                    <div className="p-6 sm:p-8">
+                        {/* Üst Bilgi Başlığı */}
+                        <div className="flex justify-between items-center mb-6">
+                            <span className="text-xs font-bold uppercase bg-indigo-950 text-indigo-400 px-3 py-1 rounded-full border border-indigo-800">
+                                Soru {currentIdx + 1} / {questions.length}
+                            </span>
+                            <span className="text-sm text-slate-400">Skor: <span className="text-emerald-400 font-bold">{score}</span></span>
+                        </div>
+
+                        {/* Soru Metni Alanı */}
+                        <div className="bg-slate-900 rounded-xl p-6 mb-6 border border-slate-750 text-center text-xl font-medium shadow-inner overflow-hidden">
+                            {currentQuestion.q.includes('\\int') ? (
+                                <MathText math={currentQuestion.q} block={true} />
+                            ) : (
+                                <div className="flex flex-col items-center gap-2">
+                                    <span className="text-slate-400 text-sm">Belirsiz integralini hesaplayınız:</span>
+                                    <MathText math={`\\int ${currentQuestion.q}`} block={true} />
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Şıklar / Seçenekler Alanı */}
+                        <div className="space-y-3 mb-6">
+                            {currentQuestion.options.map((opt, idx) => {
+                                let btnStyle = "border-slate-700 bg-slate-850 hover:bg-slate-750 text-slate-200 cursor-pointer";
+                                if (selectedOpt === idx && !isAnswered) btnStyle = "border-indigo-500 bg-indigo-950/40 text-indigo-200";
+                                if (isAnswered) {
+                                    if (idx === currentQuestion.answer) btnStyle = "border-emerald-500 bg-emerald-950/30 text-emerald-300 pointer-events-none";
+                                    else if (selectedOpt === idx) btnStyle = "border-rose-500 bg-rose-950/30 text-rose-300 pointer-events-none";
+                                    else btnStyle = "border-slate-800 bg-slate-850 text-slate-500 opacity-40 pointer-events-none";
+                                }
+
+                                return (
+                                    <button key={idx} onClick={() => handleOptionClick(idx)} className={`w-full flex items-center border-2 rounded-xl p-4 transition-all duration-150 text-left font-medium overflow-hidden ${btnStyle}`}>
+                                        <span className={`w-7 h-7 flex items-center justify-center rounded-lg text-sm font-bold mr-4 shrink-0 ${selectedOpt === idx ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-400'}`}>
+                                            {getLetter(idx)}
+                                        </span>
+                                        {/* no-scrollbar ve overflow-hidden sayesinde tarayıcı dikey/yatay çizgileri tamamen bloke edildi */}
+                                        <div className="text-base tracking-wide overflow-hidden no-scrollbar w-full">
+                                            <MathText math={opt} />
+                                        </div>
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        {/* Alt Butonlar */}
+                        <div className="flex justify-end">
+                            {!isAnswered ? (
+                                <button onClick={handleSubmit} disabled={selectedOpt === null} className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold px-8 py-3 rounded-xl transition duration-150 shadow-lg cursor-pointer">
+                                    Cevabı Onayla
+                                </button>
+                            ) : (
+                                <button onClick={handleNext} className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-8 py-3 rounded-xl transition duration-150 shadow-lg cursor-pointer">
+                                    {currentIdx + 1 === questions.length ? "Sonuçları Gör" : "Sıradaki Soru →"}
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
